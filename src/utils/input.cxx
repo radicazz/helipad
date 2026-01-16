@@ -113,7 +113,7 @@ namespace engine {
                 } else if constexpr (std::is_same_v<event_type, laya::mouse_motion_event>) {
                     m_mouse_pos = {static_cast<float>(evt.x), static_cast<float>(evt.y)};
                 } else if constexpr (std::is_same_v<event_type, laya::mouse_wheel_event>) {
-                    m_mouse_wheel += {evt.precise_x, evt.precise_y};
+                    m_mouse_wheel += glm::vec2{evt.precise_x, evt.precise_y};
                 } else if constexpr (std::is_same_v<event_type, laya::window_event>) {
                     m_window_events.push_back(evt);
                 }
