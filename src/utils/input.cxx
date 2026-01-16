@@ -5,7 +5,12 @@
 #include <type_traits>
 
 namespace engine {
-    game_input::game_input() : m_mouse_pos(0, 0), m_mouse_delta(0, 0), m_previous_mouse_pos(0, 0) {
+    game_input::game_input()
+        : m_mouse_pos(0, 0),
+          m_mouse_delta(0, 0),
+          m_previous_mouse_pos(0, 0),
+          m_mouse_wheel(0, 0),
+          m_window_events() {
     }
 
     void game_input::update() {
@@ -16,6 +21,8 @@ namespace engine {
         // Update mouse delta
         m_mouse_delta = m_mouse_pos - m_previous_mouse_pos;
         m_previous_mouse_pos = m_mouse_pos;
+        m_mouse_wheel = {0.0f, 0.0f};
+        m_window_events.clear();
 
         // Move current to previous
         m_previous_keys = m_current_keys;
@@ -105,6 +112,10 @@ namespace engine {
                     }
                 } else if constexpr (std::is_same_v<event_type, laya::mouse_motion_event>) {
                     m_mouse_pos = {static_cast<float>(evt.x), static_cast<float>(evt.y)};
+                } else if constexpr (std::is_same_v<event_type, laya::mouse_wheel_event>) {
+                    m_mouse_wheel += {evt.precise_x, evt.precise_y};
+                } else if constexpr (std::is_same_v<event_type, laya::window_event>) {
+                    m_window_events.push_back(evt);
                 }
             },
             event);

@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 #include <unordered_set>
 #include <array>
+#include <vector>
 
 namespace engine {
     /**
@@ -98,6 +99,8 @@ namespace engine {
          * @return The mouse movement delta as a glm::vec2.
          */
         [[nodiscard]] glm::vec2 get_mouse_movement() const;
+        [[nodiscard]] glm::vec2 get_mouse_wheel() const;
+        [[nodiscard]] const std::vector<laya::window_event>& get_window_events() const;
 
     private:
         [[nodiscard]] constexpr game_input_key sdl_key_to_input_key(SDL_Scancode sdl_key) const;
@@ -112,6 +115,8 @@ namespace engine {
         glm::vec2 m_mouse_pos;
         glm::vec2 m_mouse_delta;
         glm::vec2 m_previous_mouse_pos;
+        glm::vec2 m_mouse_wheel;
+        std::vector<laya::window_event> m_window_events;
 
         static constexpr key_map m_key_map = {
             std::make_pair(SDL_SCANCODE_W, game_input_key::w),
@@ -148,6 +153,14 @@ namespace engine {
 
     inline glm::vec2 game_input::get_mouse_movement() const {
         return m_mouse_delta;
+    }
+
+    inline glm::vec2 game_input::get_mouse_wheel() const {
+        return m_mouse_wheel;
+    }
+
+    inline const std::vector<laya::window_event>& game_input::get_window_events() const {
+        return m_window_events;
     }
 
     constexpr game_input_key game_input::sdl_key_to_input_key(const SDL_Scancode scancode) const {
