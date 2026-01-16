@@ -37,10 +37,10 @@ namespace engine {
      * @param loc Source location where the check is performed.
      * @note This function only performs the check if `is_paranoid_build` is true.
      */
-    inline void paranoid_ensure(const bool [[maybe_unused]] condition,
-                                std::string_view [[maybe_unused]] msg,
-                                const std::source_location
-                                [[maybe_unused]] loc = std::source_location::current()) {
+    inline void paranoid_ensure([[maybe_unused]] const bool condition,
+                                [[maybe_unused]] std::string_view msg,
+                                [[maybe_unused]] const std::source_location
+                                    loc = std::source_location::current()) {
         if constexpr (is_paranoid_build) {
             if (!condition) {
                 throw error_message("{}:{} [{}] -> {}", loc.file_name(), loc.line(),

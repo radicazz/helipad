@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <string>
+#include <memory>
 #include <format>
 #include "color.hxx"
 
