@@ -18,3 +18,6 @@
 	path = external/entt
 	url = https://github.com/skypjack/entt
 	branch = v3.13.x
+[submodule "external/laya"]
+	path = external/laya
+	url = https://github.com/radicazz/laya

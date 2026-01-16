@@ -12,6 +12,11 @@ endif()
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/SDL" EXCLUDE_FROM_ALL)
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/SDL_image" EXCLUDE_FROM_ALL)
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/SDL_ttf" EXCLUDE_FROM_ALL)
+set(LAYA_BUILD_ALL OFF CACHE BOOL "Disable laya optional components" FORCE)
+set(LAYA_BUILD_TESTS OFF CACHE BOOL "Disable laya tests" FORCE)
+set(LAYA_BUILD_EXAMPLES OFF CACHE BOOL "Disable laya examples" FORCE)
+set(LAYA_SDL_TARGETS_PROVIDED ON CACHE BOOL "Use parent SDL3 targets for laya" FORCE)
+add_subdirectory("${CMAKE_SOURCE_DIR}/external/laya" EXCLUDE_FROM_ALL)
 
 function(engine_link_external_libraries ENGINE_TARGET_NAME)
   if(NOT TARGET ${ENGINE_TARGET_NAME})
@@ -22,6 +27,7 @@ function(engine_link_external_libraries ENGINE_TARGET_NAME)
   target_link_libraries(
     ${ENGINE_TARGET_NAME}
     PUBLIC
+      laya::laya
       SDL3::SDL3
       SDL3_image::SDL3_image
       SDL3_ttf::SDL3_ttf
