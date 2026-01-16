@@ -48,8 +48,8 @@ namespace engine {
                    game_engine* engine);
         ~game_scene() = default;
 
-        game_scene(const game_scene&) = default;
-        game_scene& operator=(const game_scene&) = default;
+        game_scene(const game_scene&) = delete;
+        game_scene& operator=(const game_scene&) = delete;
         game_scene(game_scene&&) = default;
         game_scene& operator=(game_scene&&) = default;
 
