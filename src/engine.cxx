@@ -1,9 +1,11 @@
 #include "engine.hxx"
 
 #include <stdexcept>
+#include <variant>
 
 #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <laya/events/event_polling.hpp>
 
 #include "logger.hxx"
 #include "safety.hxx"
@@ -58,13 +60,12 @@ namespace engine {
             {
                 m_input->update();
 
-                SDL_Event event;
-                while (SDL_PollEvent(&event) == true) {
-                    if (event.type == SDL_EVENT_QUIT) {
+                for (const auto& event : laya::events_view()) {
+                    if (std::holds_alternative<laya::quit_event>(event)) {
                         m_is_running = false;
                     }
 
-                    m_input->process_sdl_event(event);
+                    m_input->process_event(event);
                 }
 
                 m_scenes->on_engine_input();
@@ -113,9 +114,6 @@ namespace engine {
     game_engine::engine_wrapper::~engine_wrapper() {
         TTF_Quit();
         log_info("TTF shut down.");
-
-        SDL_Quit();
-        log_info("SDL shut down.");
     }
 }  // namespace engine
 

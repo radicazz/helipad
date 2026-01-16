@@ -6,6 +6,7 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <laya/events/event_types.hpp>
 #include <glm/glm.hpp>
 #include <unordered_set>
 #include <array>
@@ -70,6 +71,7 @@ namespace engine {
 
         void update();
         void process_sdl_event(const SDL_Event& event);
+        void process_event(const laya::event& event);
 
         [[nodiscard]] bool is_key_pressed(game_input_key key) const;
         [[nodiscard]] bool is_key_held(game_input_key key) const;
