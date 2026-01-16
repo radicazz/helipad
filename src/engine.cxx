@@ -94,19 +94,15 @@ namespace engine {
         m_is_running = false;
     }
 
-    game_engine::engine_wrapper::engine_wrapper() {
+    game_engine::engine_wrapper::engine_wrapper()
+        : m_context(laya::subsystem::video) {
         log_info("\n");
         log_info("Project '{}' (v{} {}) starting up...", project_name, version::full, build_type);
-
-        if (SDL_Init(SDL_INIT_VIDEO) == false) {
-            throw error_message("Failed to initialize SDL. {}", SDL_GetError());
-        }
 
         log_info("SDL initialized successfully: v{}.{}.{}", SDL_MAJOR_VERSION, SDL_MINOR_VERSION,
                  SDL_MICRO_VERSION);
 
         if (TTF_Init() == false) {
-            SDL_Quit();
             throw error_message("Failed to initialize SDL_ttf.");
         }
 

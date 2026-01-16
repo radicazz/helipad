@@ -17,6 +17,7 @@
 #include "utils/scenes.hxx"
 #include "ecs/entities.hxx"
 #include "utils/timing.hxx"
+#include <laya/subsystems.hpp>
 
 /**
  * @brief The main entry point of the application.
@@ -122,6 +123,9 @@ namespace engine {
         struct engine_wrapper {
             engine_wrapper();
             ~engine_wrapper();
+
+        private:
+            laya::context m_context;
         };
 
     private:
