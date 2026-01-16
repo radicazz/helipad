@@ -5,6 +5,8 @@
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace engine {
     game_window::game_window(std::string_view title, const glm::ivec2& size, game_window_type type)
@@ -28,7 +30,8 @@ namespace engine {
                 break;
         }
 
-        if (m_window = SDL_CreateWindow(title.data(), size.x, size.y, window_flags);
+        const std::string title_text{title};
+        if (m_window = SDL_CreateWindow(title_text.c_str(), size.x, size.y, window_flags);
             m_window == nullptr) {
             TTF_Quit();
             SDL_Quit();
@@ -66,7 +69,8 @@ namespace engine {
     }
 
     void game_window::set_title(std::string_view new_title) {
-        if (SDL_SetWindowTitle(m_window, new_title.data()) == false) {
+        const std::string title_text{new_title};
+        if (SDL_SetWindowTitle(m_window, title_text.c_str()) == false) {
             log_warning("Failed to set window title: {}", new_title);
             return;
         }

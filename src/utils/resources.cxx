@@ -106,16 +106,17 @@ namespace engine {
     }
 
     SDL_Texture* game_resources::texture_get_or_create(std::string_view file_path) {
-        if (is_texture_loaded(file_path) == true) {
-            return m_textures.at(file_path.data());
+        const std::string key{file_path};
+        if (is_texture_loaded(key) == true) {
+            return m_textures.at(key);
         }
 
-        SDL_Texture* texture = IMG_LoadTexture(m_renderer->get_sdl_renderer(), file_path.data());
+        SDL_Texture* texture = IMG_LoadTexture(m_renderer->get_sdl_renderer(), key.c_str());
         if (texture == nullptr) {
             throw error_message("Failed to load the texture at: {}", file_path);
         }
 
-        m_textures[file_path.data()] = texture;
+        m_textures[key] = texture;
 
         log_info("Loaded texture: {}", file_path);
 
@@ -123,7 +124,8 @@ namespace engine {
     }
 
     void game_resources::texture_destroy(std::string_view file_path) {
-        auto it = m_textures.find(file_path.data());
+        const std::string key{file_path};
+        auto it = m_textures.find(key);
         if (it != m_textures.end()) {
             SDL_DestroyTexture(it->second);
             log_info("Unloaded texture: {}", file_path);
@@ -132,7 +134,7 @@ namespace engine {
     }
 
     bool game_resources::is_texture_loaded(std::string_view file_path) const {
-        return m_textures.contains(file_path.data());
+        return m_textures.contains(std::string(file_path));
     }
 
     TTF_Font* game_resources::font_get_or_create(std::string_view font_path, float font_size) {
@@ -143,7 +145,8 @@ namespace engine {
             return m_fonts.at(unique_key);
         }
 
-        TTF_Font* font = TTF_OpenFont(font_path.data(), font_size);
+        const std::string path{font_path};
+        TTF_Font* font = TTF_OpenFont(path.c_str(), font_size);
         if (font == nullptr) {
             throw error_message("Failed to load font: {}", font_path);
         }
@@ -156,7 +159,8 @@ namespace engine {
     }
 
     void game_resources::font_destroy(std::string_view unique_key) {
-        auto it = m_fonts.find(unique_key.data());
+        const std::string key{unique_key};
+        auto it = m_fonts.find(key);
         if (it != m_fonts.end()) {
             TTF_CloseFont(it->second);
             log_info("Unloaded font: {}", unique_key);
@@ -165,7 +169,7 @@ namespace engine {
     }
 
     bool game_resources::is_font_loaded(std::string_view unique_key) const {
-        return m_fonts.contains(unique_key.data());
+        return m_fonts.contains(std::string(unique_key));
     }
 
     std::string game_resources::get_font_unique_key(std::string_view font_path,
