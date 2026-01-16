@@ -10,26 +10,15 @@
 #include <stdexcept>
 
 namespace engine {
-    game_renderer::game_renderer(SDL_Window* window)
-        : m_sdl_renderer(nullptr),
+    game_renderer::game_renderer(laya::window& window)
+        : m_renderer(window),
           m_sdl_text_engine(nullptr),
           m_camera(nullptr),
           m_viewport(nullptr) {
-        if (m_sdl_renderer = SDL_CreateRenderer(window, nullptr); m_sdl_renderer == nullptr) {
-            TTF_Quit();
-            SDL_Quit();
-            throw std::runtime_error("Failed to create renderer");
-        }
+        log_info("Renderer created: {}", SDL_GetRendererName(m_renderer.native_handle()));
 
-        log_info("Renderer created: {}", SDL_GetRendererName(m_sdl_renderer));
-
-        m_sdl_text_engine = TTF_CreateRendererTextEngine(m_sdl_renderer);
+        m_sdl_text_engine = TTF_CreateRendererTextEngine(m_renderer.native_handle());
         if (m_sdl_text_engine == nullptr) {
-            SDL_DestroyRenderer(m_sdl_renderer);
-
-            TTF_Quit();
-            SDL_Quit();
-
             throw std::runtime_error("Failed to create TTF text engine.");
         }
 
@@ -41,20 +30,14 @@ namespace engine {
             TTF_DestroyRendererTextEngine(m_sdl_text_engine);
             log_info("TTF text engine destroyed.");
         }
-
-        if (m_sdl_renderer != nullptr) {
-            SDL_DestroyRenderer(m_sdl_renderer);
-            log_info("SDL Renderer destroyed.");
-        }
     }
 
     game_renderer::game_renderer(game_renderer&& other) noexcept
-        : m_sdl_renderer(other.m_sdl_renderer),
+        : m_renderer(std::move(other.m_renderer)),
           m_sdl_text_engine(other.m_sdl_text_engine),
           m_camera(other.m_camera),
           m_viewport(other.m_viewport),
           m_viewports(std::move(other.m_viewports)) {
-        other.m_sdl_renderer = nullptr;
         other.m_sdl_text_engine = nullptr;
         other.m_camera = nullptr;
         other.m_viewport = nullptr;
@@ -66,19 +49,15 @@ namespace engine {
             if (m_sdl_text_engine) {
                 TTF_DestroyRendererTextEngine(m_sdl_text_engine);
             }
-            if (m_sdl_renderer) {
-                SDL_DestroyRenderer(m_sdl_renderer);
-            }
 
             // Move resources
-            m_sdl_renderer = other.m_sdl_renderer;
+            m_renderer = std::move(other.m_renderer);
             m_sdl_text_engine = other.m_sdl_text_engine;
             m_camera = other.m_camera;
             m_viewport = other.m_viewport;
             m_viewports = std::move(other.m_viewports);
 
             // Reset other
-            other.m_sdl_renderer = nullptr;
             other.m_sdl_text_engine = nullptr;
             other.m_camera = nullptr;
             other.m_viewport = nullptr;
@@ -91,15 +70,15 @@ namespace engine {
         if (m_viewport != nullptr) {
             m_viewport->apply_to_sdl(*this);
         } else {
-            SDL_SetRenderViewport(m_sdl_renderer, nullptr);
+            m_renderer.reset_viewport();
         }
 
-        SDL_SetRenderDrawColor(m_sdl_renderer, 0, 0, 0, 255);
-        SDL_RenderClear(m_sdl_renderer);
+        m_renderer.set_draw_color(laya::colors::black);
+        m_renderer.clear();
     }
 
     void game_renderer::draw_end() {
-        SDL_RenderPresent(m_sdl_renderer);
+        m_renderer.present();
     }
 
     void game_renderer::sprite_draw_world(const game_sprite* sprite,
@@ -137,7 +116,8 @@ namespace engine {
                                     screen_position.y - final_origin.y, final_size.x, final_size.y};
         const SDL_FPoint center = {final_origin.x, final_origin.y};
 
-        SDL_RenderTextureRotated(m_sdl_renderer, sprite->get_sdl_texture(), nullptr, &dst_rect,
+        SDL_RenderTextureRotated(m_renderer.native_handle(), sprite->get_sdl_texture(), nullptr,
+                                 &dst_rect,
                                  sprite->get_rotation(), &center, SDL_FLIP_NONE);
     }
     void game_renderer::sprite_draw_screen(const game_sprite* sprite,
@@ -153,7 +133,8 @@ namespace engine {
                                     size.x, size.y};
         const SDL_FPoint center = {origin.x, origin.y};
 
-        SDL_RenderTextureRotated(m_sdl_renderer, sprite->get_sdl_texture(), nullptr, &dst_rect,
+        SDL_RenderTextureRotated(m_renderer.native_handle(), sprite->get_sdl_texture(), nullptr,
+                                 &dst_rect,
                                  sprite->get_rotation(), &center, SDL_FLIP_NONE);
     }
 
@@ -226,11 +207,12 @@ namespace engine {
         // Render with transformations
         if (text_rotation != 0.0f) {
             // Render with rotation
-            SDL_RenderTextureRotated(m_sdl_renderer, texture, nullptr, &dest_rect, text_rotation,
+            SDL_RenderTextureRotated(m_renderer.native_handle(), texture, nullptr, &dest_rect,
+                                     text_rotation,
                                      &center, SDL_FLIP_NONE);
         } else {
             // Simple render without rotation (slightly more efficient)
-            SDL_RenderTexture(m_sdl_renderer, texture, nullptr, &dest_rect);
+            SDL_RenderTexture(m_renderer.native_handle(), texture, nullptr, &dest_rect);
         }
     }
 
@@ -251,8 +233,8 @@ namespace engine {
 
     glm::vec2 game_renderer::get_output_size() const {
         int w = 0, h = 0;
-        SDL_GetRenderOutputSize(m_sdl_renderer, &w, &h);
-        return {static_cast<float>(w), static_cast<float>(h)};
+        const laya::dimensions size = m_renderer.get_output_size();
+        return {static_cast<float>(size.width), static_cast<float>(size.height)};
     }
 
     // Multi-viewport API implementation

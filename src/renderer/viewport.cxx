@@ -1,7 +1,5 @@
 #include "viewport.hxx"
 
-#include <SDL3/SDL.h>
-
 #include "camera.hxx"
 #include "renderer.hxx"
 
@@ -37,14 +35,12 @@ namespace engine {
         m_cached_position_pixels = glm::floor(m_position * output_size);
         m_cached_size_pixels = glm::floor(m_size * output_size);
 
-        SDL_Rect rect{static_cast<int>(m_cached_position_pixels.x),
-                      static_cast<int>(m_cached_position_pixels.y),
-                      static_cast<int>(m_cached_size_pixels.x),
-                      static_cast<int>(m_cached_size_pixels.y)};
+        const laya::rect rect{static_cast<int>(m_cached_position_pixels.x),
+                              static_cast<int>(m_cached_position_pixels.y),
+                              static_cast<int>(m_cached_size_pixels.x),
+                              static_cast<int>(m_cached_size_pixels.y)};
 
-        if (SDL_SetRenderViewport(renderer.get_sdl_renderer(), &rect) == false) {
-            log_error("Failed to set renderer viewport.");
-        }
+        renderer.get_laya_renderer().set_viewport(rect);
     }
 
     glm::mat3 game_viewport::get_view_matrix(const game_camera& camera) const {

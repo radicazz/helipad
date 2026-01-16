@@ -8,6 +8,9 @@
 #include <string_view>
 #include <string>
 
+#include <laya/renderers/renderer.hpp>
+
+struct SDL_Renderer;
 struct TTF_TextEngine;
 
 namespace engine {
@@ -19,7 +22,7 @@ namespace engine {
      */
     class game_renderer {
     public:
-        explicit game_renderer(SDL_Window* window);
+        explicit game_renderer(laya::window& window);
         ~game_renderer();
 
         // Resource management - disable copy, enable move
@@ -30,6 +33,8 @@ namespace engine {
 
         [[nodiscard]] SDL_Renderer* get_sdl_renderer() const;
         [[nodiscard]] TTF_TextEngine* get_sdl_text_engine() const;
+        [[nodiscard]] laya::renderer& get_laya_renderer() noexcept;
+        [[nodiscard]] const laya::renderer& get_laya_renderer() const noexcept;
 
         void draw_begin();
         void draw_end();
@@ -71,7 +76,7 @@ namespace engine {
         // Future: expose iteration rendering hook if needed
 
     private:
-        SDL_Renderer* m_sdl_renderer;
+        laya::renderer m_renderer;
         TTF_TextEngine* m_sdl_text_engine;
         const game_camera* m_camera;
         const game_viewport* m_viewport;
@@ -79,10 +84,18 @@ namespace engine {
     };
 
     inline SDL_Renderer* game_renderer::get_sdl_renderer() const {
-        return m_sdl_renderer;
+        return m_renderer.native_handle();
     }
     inline TTF_TextEngine* game_renderer::get_sdl_text_engine() const {
         return m_sdl_text_engine;
+    }
+
+    inline laya::renderer& game_renderer::get_laya_renderer() noexcept {
+        return m_renderer;
+    }
+
+    inline const laya::renderer& game_renderer::get_laya_renderer() const noexcept {
+        return m_renderer;
     }
 
     inline void game_renderer::set_camera(const game_camera* cam) {

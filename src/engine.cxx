@@ -16,7 +16,7 @@ namespace engine {
           m_state(game_state),
           m_callbacks(callbacks),
           m_window(std::make_unique<game_window>(title, size, game_window_type::resizable)),
-          m_renderer(std::make_unique<game_renderer>(m_window->get_sdl_window())),
+          m_renderer(std::make_unique<game_renderer>(m_window->get_laya_window())),
           m_input(std::make_unique<game_input>()),
           m_scenes(std::make_unique<game_scenes>(this)),
           m_tick_interval_seconds(-1.f),
