@@ -52,7 +52,8 @@ namespace engine {
         : m_sdl_renderer(other.m_sdl_renderer),
           m_sdl_text_engine(other.m_sdl_text_engine),
           m_camera(other.m_camera),
-          m_viewport(other.m_viewport) {
+          m_viewport(other.m_viewport),
+          m_viewports(std::move(other.m_viewports)) {
         other.m_sdl_renderer = nullptr;
         other.m_sdl_text_engine = nullptr;
         other.m_camera = nullptr;
@@ -74,6 +75,7 @@ namespace engine {
             m_sdl_text_engine = other.m_sdl_text_engine;
             m_camera = other.m_camera;
             m_viewport = other.m_viewport;
+            m_viewports = std::move(other.m_viewports);
 
             // Reset other
             other.m_sdl_renderer = nullptr;
@@ -257,33 +259,35 @@ namespace engine {
     game_viewport& game_renderer::viewport_get_or_create(std::string_view name,
                                                          const glm::vec2& pos_norm,
                                                          const glm::vec2& size_norm) {
-        auto it = m_viewports.find(std::string(name));
+        std::string key{name};
+        auto it = m_viewports.find(key);
         if (it != m_viewports.end()) {
-            return it->second;
+            return *it->second;
         }
 
-        game_viewport vp{name, pos_norm, size_norm};
-        auto [insert_it, _] = m_viewports.emplace(std::string(name), vp);
+        auto viewport = std::make_unique<game_viewport>(name, pos_norm, size_norm);
+        auto* viewport_ptr = viewport.get();
+        auto [insert_it, _] = m_viewports.emplace(std::move(key), std::move(viewport));
         // Maintain legacy pointer if first viewport or named "main" and none selected yet
         if (m_viewport == nullptr || name == "main") {
-            m_viewport = &insert_it->second;
+            m_viewport = viewport_ptr;
         }
 
-        return insert_it->second;
+        return *insert_it->second;
     }
 
     game_viewport* game_renderer::viewport_get(std::string_view name) {
         auto it = m_viewports.find(std::string(name));
         if (it == m_viewports.end())
             return nullptr;
-        return &it->second;
+        return it->second.get();
     }
 
     bool game_renderer::viewport_remove(std::string_view name) {
         auto it = m_viewports.find(std::string(name));
         if (it == m_viewports.end())
             return false;
-        if (&it->second == m_viewport) {
+        if (it->second.get() == m_viewport) {
             m_viewport = nullptr;  // legacy pointer invalidated
         }
         m_viewports.erase(it);
@@ -296,7 +300,7 @@ namespace engine {
             return nullptr;
         }
 
-        return &it->second;
+        return it->second.get();
     }
 
 }  // namespace engine

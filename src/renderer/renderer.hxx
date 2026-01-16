@@ -4,6 +4,7 @@
 #include "text.hxx"
 
 #include <unordered_map>
+#include <memory>
 #include <string_view>
 #include <string>
 
@@ -47,7 +48,8 @@ namespace engine {
                                               const glm::vec2& size_norm = {1.f, 1.f});
         game_viewport* viewport_get(std::string_view name);
         bool viewport_remove(std::string_view name);
-        [[nodiscard]] const std::unordered_map<std::string, game_viewport>& viewports() const {
+        [[nodiscard]] const std::unordered_map<std::string, std::unique_ptr<game_viewport>>&
+        viewports() const {
             return m_viewports;
         }
         [[nodiscard]] game_viewport* viewport_main();  // convenience "main"
@@ -73,7 +75,7 @@ namespace engine {
         TTF_TextEngine* m_sdl_text_engine;
         const game_camera* m_camera;
         const game_viewport* m_viewport;
-        std::unordered_map<std::string, game_viewport> m_viewports;  // name -> viewport
+        std::unordered_map<std::string, std::unique_ptr<game_viewport>> m_viewports;
     };
 
     inline SDL_Renderer* game_renderer::get_sdl_renderer() const {
