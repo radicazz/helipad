@@ -98,8 +98,8 @@ namespace engine {
         [[nodiscard]] glm::vec2 get_mouse_movement() const;
 
     private:
-        constexpr [[nodiscard]] game_input_key sdl_key_to_input_key(SDL_Scancode sdl_key) const;
-        constexpr [[nodiscard]] game_input_key sdl_mouse_to_input_key(Uint8 sdl_button) const;
+        [[nodiscard]] constexpr game_input_key sdl_key_to_input_key(SDL_Scancode sdl_key) const;
+        [[nodiscard]] constexpr game_input_key sdl_mouse_to_input_key(Uint8 sdl_button) const;
 
     private:
         std::unordered_set<game_input_key> m_current_keys;

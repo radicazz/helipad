@@ -22,9 +22,9 @@ namespace engine {
         game_entities() = default;
         ~game_entities() = default;
 
-        // Rule of 5 - using defaults since no resource management
-        game_entities(const game_entities&) = default;
-        game_entities& operator=(const game_entities&) = default;
+        // Registry is non-copyable
+        game_entities(const game_entities&) = delete;
+        game_entities& operator=(const game_entities&) = delete;
         game_entities(game_entities&&) = default;
         game_entities& operator=(game_entities&&) = default;
 

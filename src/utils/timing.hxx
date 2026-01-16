@@ -36,7 +36,7 @@ namespace engine {
      * std::cout << "Elapsed time: " << elapsed_seconds << " seconds\n";
      * @endcode
      */
-    inline [[nodiscard]] float performance_counter_seconds_since(
+    [[nodiscard]] inline float performance_counter_seconds_since(
         std::uint64_t start_value) noexcept {
         const std::uint64_t now = performance_counter_value_current();
         return performance_counter_seconds_between(start_value, now);

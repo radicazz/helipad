@@ -60,7 +60,7 @@ namespace engine {
         static constexpr std::string_view default_name = "main";
 
     private:
-        static [[nodiscard]] glm::vec2 clamp_normalized(const glm::vec2& vec);
+        [[nodiscard]] static glm::vec2 clamp_normalized(const glm::vec2& vec);
 
     private:
         std::string m_name;
@@ -101,6 +101,6 @@ namespace engine {
     }
 
     inline glm::vec2 game_viewport::clamp_normalized(const glm::vec2& vec) {
-        return glm::clamp(vec, {0.f}, {1.f});
+        return glm::clamp(vec, glm::vec2{0.f}, glm::vec2{1.f});
     }
 }  // namespace engine
