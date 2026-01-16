@@ -163,8 +163,8 @@ namespace engine {
 
         glm::vec2 screen_position;
 
-        if (m_camera != nullptr) {
-            // Transform world position to screen coordinates using camera
+        if (m_camera != nullptr && m_viewport != nullptr) {
+            // Transform world position to screen coordinates using camera + viewport
             screen_position = m_viewport->world_to_screen(*m_camera, world_position);
 
             // Frustum culling: skip drawing if text is outside view

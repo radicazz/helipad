@@ -120,12 +120,14 @@ namespace engine {
         if (it == m_scenes.end()) {
             log_error("Active scene '{}' not found in scene registry", m_active_scene_name);
             m_active_scene_name.clear();
+            reset_renderer_to_global();
             return;
         }
 
         game_scene* scene = it->second.get();
         invoke_void(scene->get_callbacks().on_deactivate, scene);
         m_active_scene_name.clear();
+        reset_renderer_to_global();
 
         log_info("Scene deactivated successfully");
     }
