@@ -60,6 +60,10 @@ venv/
 /Makefile
 /install_manifest.txt
 
+# Cache directories
+.cache/
+.ccache/
+
 # VS Code settings
 .vscode/
 
