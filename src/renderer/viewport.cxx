@@ -3,7 +3,7 @@
 #include "camera.hxx"
 #include "renderer.hxx"
 
-#include "../logger.hxx"
+#include <laya/logging/log.hpp>
 
 namespace engine {
     game_viewport::game_viewport(std::string_view name, const glm::vec2& position_normalized,
@@ -14,11 +14,11 @@ namespace engine {
           m_cached_position_pixels(),
           m_cached_size_pixels() {
         if (m_size.x > 1.f || m_size.x < 0.f) {
-            log_warning("Viewport size x component out of range [0.f, 1.f]: {}", m_size.x);
+            laya::log_warn("Viewport size x component out of range [0.f, 1.f]: {}", m_size.x);
         }
 
         if (m_size.y > 1.f || m_size.y < 0.f) {
-            log_warning("Viewport size y component out of range [0.f, 1.f]: {}", m_size.y);
+            laya::log_warn("Viewport size y component out of range [0.f, 1.f]: {}", m_size.y);
         }
 
         set_rect(m_position, m_size);

@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "logger.hxx"
 #include "renderer/renderer.hxx"
 #include "renderer/camera.hxx"
 #include "renderer/viewport.hxx"

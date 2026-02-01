@@ -3,10 +3,9 @@
 #include "camera.hxx"
 #include "viewport.hxx"
 
-#include "../logger.hxx"
-
 #include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3/SDL.h>
+#include <laya/logging/log.hpp>
 #include <stdexcept>
 
 namespace engine {
@@ -15,20 +14,20 @@ namespace engine {
           m_sdl_text_engine(nullptr),
           m_camera(nullptr),
           m_viewport(nullptr) {
-        log_info("Renderer created: {}", SDL_GetRendererName(m_renderer.native_handle()));
+        laya::log_info("Renderer created: {}", SDL_GetRendererName(m_renderer.native_handle()));
 
         m_sdl_text_engine = TTF_CreateRendererTextEngine(m_renderer.native_handle());
         if (m_sdl_text_engine == nullptr) {
             throw std::runtime_error("Failed to create TTF text engine.");
         }
 
-        log_info("TTF text engine created successfully.");
+        laya::log_info("TTF text engine created successfully.");
     }
 
     game_renderer::~game_renderer() {
         if (m_sdl_text_engine != nullptr) {
             TTF_DestroyRendererTextEngine(m_sdl_text_engine);
-            log_info("TTF text engine destroyed.");
+            laya::log_info("TTF text engine destroyed.");
         }
     }
 

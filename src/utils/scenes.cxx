@@ -6,10 +6,10 @@
 #include "scenes.hxx"
 
 #include <stdexcept>
+#include <laya/logging/log.hpp>
 
 #include "../safety.hxx"
 #include "../engine.hxx"
-#include "../logger.hxx"
 
 namespace engine {
     game_scene::game_scene(std::string_view name, void* state,
@@ -38,7 +38,7 @@ namespace engine {
 
     game_scenes::~game_scenes() {
         for (auto& [scene_id, scene_info] : m_scenes) {
-            log_info("Unloading scene '{}' during cleanup", scene_id);
+            laya::log_info("Unloading scene '{}' during cleanup", scene_id);
         }
 
         m_scenes.clear();
@@ -47,7 +47,7 @@ namespace engine {
     void game_scenes::load_scene(std::string_view name, void* state,
                                  const game_scene_callbacks& callbacks) {
         if (is_scene_loaded(name) == true) {
-            log_warning("Scene '{}' is already loaded.", name);
+            laya::log_warn("Scene '{}' is already loaded.", name);
             return;
         }
 
@@ -57,12 +57,12 @@ namespace engine {
 
         invoke_void(scene_ptr->get_callbacks().on_load, scene_ptr);
 
-        log_info("Scene '{}' loaded successfully", name);
+        laya::log_info("Scene '{}' loaded successfully", name);
     }
 
     void game_scenes::unload_scene(std::string_view name) {
         if (is_scene_loaded(name) == false) {
-            log_warning("Scene '{}' is not loaded.", name);
+            laya::log_warn("Scene '{}' is not loaded.", name);
             return;
         }
 
@@ -70,7 +70,7 @@ namespace engine {
 
         // If this scene is active, deactivate it first.
         if (is_scene_active() == true && m_active_scene_name == name) {
-            log_error(
+            laya::log_error(
                 "Trying to unload active scene '{}'. Set another scene as active before "
                 "unloading.",
                 name);
@@ -82,12 +82,12 @@ namespace engine {
 
         m_scenes.erase(std::string(name));
 
-        log_info("Scene '{}' unloaded successfully", name);
+        laya::log_info("Scene '{}' unloaded successfully", name);
     }
 
     void game_scenes::activate_scene(std::string_view name) {
         if (is_scene_loaded(name) == false) {
-            log_error("Scene '{}' is not loaded. Cannot activate.", name);
+            laya::log_error("Scene '{}' is not loaded. Cannot activate.", name);
             return;
         }
 
@@ -95,7 +95,7 @@ namespace engine {
 
         if (is_scene_active() == true) {
             if (m_active_scene_name == name) {
-                log_warning("Scene '{}' is already the active scene", name);
+                laya::log_warn("Scene '{}' is already the active scene", name);
                 return;
             }
 
@@ -107,18 +107,18 @@ namespace engine {
         m_active_scene_name = name;
         update_renderer_for_active_scene();
 
-        log_info("Scene '{}' activated successfully", name);
+        laya::log_info("Scene '{}' activated successfully", name);
     }
 
     void game_scenes::deactivate_current_scene() {
         if (is_scene_active() == false) {
-            log_warning("No active scene to deactivate");
+            laya::log_warn("No active scene to deactivate");
             return;
         }
 
         auto it = m_scenes.find(m_active_scene_name);
         if (it == m_scenes.end()) {
-            log_error("Active scene '{}' not found in scene registry", m_active_scene_name);
+            laya::log_error("Active scene '{}' not found in scene registry", m_active_scene_name);
             m_active_scene_name.clear();
             reset_renderer_to_global();
             return;
@@ -129,13 +129,13 @@ namespace engine {
         m_active_scene_name.clear();
         reset_renderer_to_global();
 
-        log_info("Scene deactivated successfully");
+        laya::log_info("Scene deactivated successfully");
     }
 
     void game_scenes::for_each_scene(void (*callback)(std::string_view name,
                                                       const game_scene& scene)) const {
         if (callback == nullptr) {
-            log_error("Invalid callback provided to for_each_scene");
+            laya::log_error("Invalid callback provided to for_each_scene");
             return;
         }
 
@@ -192,7 +192,7 @@ namespace engine {
     void game_scenes::reset_renderer_to_global() {
         game_renderer* renderer = m_engine->get_renderer();
         if (renderer == nullptr) {
-            log_error("Cannot reset renderer to global: renderer is null");
+            laya::log_error("Cannot reset renderer to global: renderer is null");
             return;
         }
 

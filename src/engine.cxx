@@ -6,8 +6,8 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <laya/events/event_polling.hpp>
+#include <laya/logging/log.hpp>
 
-#include "logger.hxx"
 #include "safety.hxx"
 
 namespace engine {
@@ -41,13 +41,13 @@ namespace engine {
     void game_engine::start_running() {
         if (m_is_running == true) {
             // TODO: Better way to handle this?
-            log_error("Game engine is already running on this object.");
+            laya::log_error("Game engine is already running on this object.");
             return;
         }
 
         m_is_running = true;
 
-        log_info("Starting game loop...");
+        laya::log_info("Starting game loop...");
 
         std::uint64_t frame_performance_count = performance_counter_value_current();
         float seconds_since_last_tick = 0.f;
@@ -88,7 +88,7 @@ namespace engine {
             m_renderer->draw_end();
         }
 
-        log_info("Ending game loop...");
+        laya::log_info("Ending game loop...");
     }
 
     void game_engine::stop_running() noexcept {
@@ -97,23 +97,23 @@ namespace engine {
 
     game_engine::engine_wrapper::engine_wrapper()
         : m_context(laya::subsystem::video) {
-        log_info("\n");
-        log_info("Project '{}' (v{} {}) starting up...", project_name, version::full, build_type);
+        laya::log_info("\n");
+        laya::log_info("Project '{}' (v{} {}) starting up...", project_name, version::full, build_type);
 
-        log_info("SDL initialized successfully: v{}.{}.{}", SDL_MAJOR_VERSION, SDL_MINOR_VERSION,
+        laya::log_info("SDL initialized successfully: v{}.{}.{}", SDL_MAJOR_VERSION, SDL_MINOR_VERSION,
                  SDL_MICRO_VERSION);
 
         if (TTF_Init() == false) {
             throw error_message("Failed to initialize SDL_ttf.");
         }
 
-        log_info("TTF initialized successfully: v{}.{}.{}", SDL_TTF_MAJOR_VERSION,
+        laya::log_info("TTF initialized successfully: v{}.{}.{}", SDL_TTF_MAJOR_VERSION,
                  SDL_TTF_MINOR_VERSION, SDL_TTF_MICRO_VERSION);
     }
 
     game_engine::engine_wrapper::~engine_wrapper() {
         TTF_Quit();
-        log_info("TTF shut down.");
+        laya::log_info("TTF shut down.");
     }
 }  // namespace engine
 
