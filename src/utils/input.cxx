@@ -28,51 +28,6 @@ namespace engine {
         m_previous_keys = m_current_keys;
     }
 
-    void game_input::process_sdl_event(const SDL_Event& event) {
-        switch (event.type) {
-            case SDL_EVENT_KEY_DOWN: {
-                game_input_key k = sdl_key_to_input_key(event.key.scancode);
-                if (k != game_input_key::unknown) {
-                    if (m_current_keys.find(k) == m_current_keys.end()) {
-                        m_pressed_this_frame.insert(k);
-                    }
-                    m_current_keys.insert(k);
-                }
-                break;
-            }
-            case SDL_EVENT_KEY_UP: {
-                game_input_key k = sdl_key_to_input_key(event.key.scancode);
-                if (k != game_input_key::unknown) {
-                    m_released_this_frame.insert(k);
-                    m_current_keys.erase(k);
-                }
-                break;
-            }
-            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-                game_input_key k = sdl_mouse_to_input_key(event.button.button);
-                if (k != game_input_key::unknown) {
-                    if (m_current_keys.find(k) == m_current_keys.end()) {
-                        m_pressed_this_frame.insert(k);
-                    }
-                    m_current_keys.insert(k);
-                }
-                break;
-            }
-            case SDL_EVENT_MOUSE_BUTTON_UP: {
-                game_input_key k = sdl_mouse_to_input_key(event.button.button);
-                if (k != game_input_key::unknown) {
-                    m_released_this_frame.insert(k);
-                    m_current_keys.erase(k);
-                }
-                break;
-            }
-            case SDL_EVENT_MOUSE_MOTION: {
-                m_mouse_pos = {event.motion.x, event.motion.y};
-                break;
-            }
-        }
-    }
-
     void game_input::process_event(const laya::event& event) {
         std::visit(
             [this](const auto& evt) {

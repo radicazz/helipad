@@ -71,7 +71,6 @@ namespace engine {
         game_input& operator=(game_input&&) = default;
 
         void update();
-        void process_sdl_event(const SDL_Event& event);
         void process_event(const laya::event& event);
 
         [[nodiscard]] bool is_key_pressed(game_input_key key) const;
