@@ -94,6 +94,7 @@ def generate_user_docs() -> None:
     except Exception as exc:  # pragma: no cover - platform/process errors
         raise SystemExit(f"failed to start mkdocs serve: {exc}")
 
+
 def main() -> None:
     generate_source_docs()
     generate_user_docs()
