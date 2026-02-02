@@ -27,6 +27,7 @@ extern void game_entry_point();
 
 namespace engine {
     class game_engine;
+    class engine_builder;
 
     /**
      * @brief Global callback functions to hook into the game engine lifecycle.
@@ -62,6 +63,8 @@ namespace engine {
      * @brief The primary game engine class.
      */
     class game_engine {
+        friend class engine_builder;
+
     public:
         game_engine() = delete;
 

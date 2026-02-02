@@ -33,6 +33,7 @@ namespace engine {
     };
 
     class game_engine;
+    class scene_builder;
 
     /**
      * @brief Represents a single scene with its own state managed by the engine.
@@ -42,6 +43,11 @@ namespace engine {
      *      - No unnecessary string allocations for keys in std::unorderdered_map.
      */
     class game_scene {
+        friend scene_builder;
+        template <class T>
+            requires std::is_class_v<T>
+        friend T* get_scene_user_state(game_scene& scene);
+
     public:
         game_scene() = delete;
         game_scene(std::string_view name, void* state, const game_scene_callbacks& callbacks,

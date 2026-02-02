@@ -1,4 +1,6 @@
 #include <engine.hxx>
+#include <engine_builder.hxx>
+#include <scene_builder.hxx>
 
 struct demo_scene_state {
     entt::entity player;
@@ -156,40 +158,32 @@ struct demo_engine_state {
     demo_scene_state main_scene;
 };
 
-void game_on_engine_start(engine::game_engine* engine) {
-    auto* state = engine->get_state<demo_engine_state>();
-    engine::game_scenes* scenes = engine->get_scenes();
-
-    scenes->load_scene("main_scene", &state->main_scene,
-                       {.on_load = scene_on_load,
-                        .on_unload = nullptr,
-                        .on_activate = nullptr,
-                        .on_deactivate = nullptr,
-                        .on_input = scene_on_input,
-                        .on_tick = scene_on_tick,
-                        .on_frame = scene_on_frame,
-                        .on_draw = scene_on_draw});
-
-    scenes->activate_scene("main_scene");
-}
-
-void game_on_engine_end(engine::game_engine* engine) {
-    engine->get_scenes()->unload_scene("main_scene");
-}
-
 void game_entry_point() {
     auto engine_state = std::make_unique<demo_engine_state>();
 
-    // Callbacks that the engine exposes to the game developer.
-    engine::game_engine_callbacks engine_callbacks = {.on_start = game_on_engine_start,
-                                                      .on_end = game_on_engine_end,
-                                                      .on_tick = nullptr,
-                                                      .on_frame = nullptr,
-                                                      .on_draw = nullptr};
+    // NEW BUILDER API - More concise and discoverable!
+    auto game = engine::engine_builder()
+        .window("Space Warfare", {1280, 720})
+        .state(engine_state.get())
+        .on_start([](engine::game_engine& engine) {
+            // Access user state through builder helper
+            auto* state = engine::engine_builder::get_user_state<demo_engine_state>(engine);
 
-    // Create the game and its resources.
-    engine::game_engine game("Space Warfare", {1280, 720}, engine_state.get(), engine_callbacks);
+            // Use scene_builder for cleaner scene setup
+            engine::scene_builder("main_scene")
+                .state(&state->main_scene)
+                .on_load([](engine::game_scene& s) { scene_on_load(&s); })
+                .on_input([](engine::game_scene& s) { scene_on_input(&s); })
+                .on_tick([](engine::game_scene& s, float dt) { scene_on_tick(&s, dt); })
+                .on_frame([](engine::game_scene& s, float dt) { scene_on_frame(&s, dt); })
+                .on_draw([](engine::game_scene& s, float f) { scene_on_draw(&s, f); })
+                .register_with(engine.get_scenes(), true);  // true = activate immediately
+        })
+        .on_end([](engine::game_engine& engine) {
+            engine.get_scenes()->unload_scene("main_scene");
+        })
+        .build();
 
     // Run the game loop. (blocks until the game exits)
-    game.start_running();
+    game->start_running();
 }
