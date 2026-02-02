@@ -187,22 +187,3 @@ void game_entry_point() {
     // Run the game loop. (blocks until the game exits)
     game->start_running();
 }
-
-/* OLD API FOR COMPARISON - Can be removed once migration is complete
-void game_entry_point() {
-    auto engine_state = std::make_unique<demo_engine_state>();
-
-    // Callbacks that the engine exposes to the game developer.
-    engine::game_engine_callbacks engine_callbacks = {.on_start = game_on_engine_start,
-                                                      .on_end = game_on_engine_end,
-                                                      .on_tick = nullptr,
-                                                      .on_frame = nullptr,
-                                                      .on_draw = nullptr};
-
-    // Create the game and its resources.
-    engine::game_engine game("Space Warfare", {1280, 720}, engine_state.get(), engine_callbacks);
-
-    // Run the game loop. (blocks until the game exits)
-    game.start_running();
-}
-*/
