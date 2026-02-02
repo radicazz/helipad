@@ -1,4 +1,5 @@
 #include <engine.hxx>
+#include <engine_builder.hxx>
 
 struct demo_scene_state {
     entt::entity player;
@@ -156,27 +157,40 @@ struct demo_engine_state {
     demo_scene_state main_scene;
 };
 
-void game_on_engine_start(engine::game_engine* engine) {
-    auto* state = engine->get_state<demo_engine_state>();
-    engine::game_scenes* scenes = engine->get_scenes();
+void game_entry_point() {
+    auto engine_state = std::make_unique<demo_engine_state>();
 
-    scenes->load_scene("main_scene", &state->main_scene,
-                       {.on_load = scene_on_load,
-                        .on_unload = nullptr,
-                        .on_activate = nullptr,
-                        .on_deactivate = nullptr,
-                        .on_input = scene_on_input,
-                        .on_tick = scene_on_tick,
-                        .on_frame = scene_on_frame,
-                        .on_draw = scene_on_draw});
+    // NEW BUILDER API - More concise and discoverable!
+    auto game = engine::engine_builder()
+        .window("Space Warfare", {1280, 720})
+        .state(engine_state.get())
+        .on_start([](engine::game_engine& engine) {
+            // Access user state through builder helper
+            auto* state = engine::engine_builder::get_user_state<demo_engine_state>(engine);
+            engine::game_scenes* scenes = engine.get_scenes();
 
-    scenes->activate_scene("main_scene");
+            scenes->load_scene("main_scene", &state->main_scene,
+                              {.on_load = scene_on_load,
+                               .on_unload = nullptr,
+                               .on_activate = nullptr,
+                               .on_deactivate = nullptr,
+                               .on_input = scene_on_input,
+                               .on_tick = scene_on_tick,
+                               .on_frame = scene_on_frame,
+                               .on_draw = scene_on_draw});
+
+            scenes->activate_scene("main_scene");
+        })
+        .on_end([](engine::game_engine& engine) {
+            engine.get_scenes()->unload_scene("main_scene");
+        })
+        .build();
+
+    // Run the game loop. (blocks until the game exits)
+    game->start_running();
 }
 
-void game_on_engine_end(engine::game_engine* engine) {
-    engine->get_scenes()->unload_scene("main_scene");
-}
-
+/* OLD API FOR COMPARISON - Can be removed once migration is complete
 void game_entry_point() {
     auto engine_state = std::make_unique<demo_engine_state>();
 
@@ -193,3 +207,4 @@ void game_entry_point() {
     // Run the game loop. (blocks until the game exits)
     game.start_running();
 }
+*/
